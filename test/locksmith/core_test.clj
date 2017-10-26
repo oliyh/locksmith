@@ -139,6 +139,25 @@
               :winning_driver {:first_name "Lewis"
                                :team_name "mercedes_gp"}}])))))
 
+(deftest symmetry-test
+  (let [races [{:country-name "GB"
+                :winning-driver {:first-name "Lewis"
+                                 :team-name :mercedes-gp
+                                 :champion? true}
+                :competing-drivers [{:first-name "Lewis"
+                                     :team-name :mercedes-gp
+                                     :champion? true}
+                                    {:first-name "Sebastian"
+                                     :team-name :ferrari-scuderia
+                                     :champion? true}
+                                    {:first-name "Max"
+                                     :team-name :red-bull
+                                     :champion? false}]}]]
+
+    (is (= races
+           (-> races
+               ((clj->gql lacinia-schema :car_races))
+               ((gql->clj lacinia-schema :car_races)))))))
+
 ;; todo
-;; 1. test that clj->gql and gql->clj are symmetric
-;; 2. Circular graphs? Avoid blowing up
+;; 1. Circular graphs? Avoid blowing up
