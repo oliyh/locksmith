@@ -17,103 +17,128 @@
 
 (deftest clj->gql-test
 
-  (is (= {:first_name "Lewis"}
-         ((clj->gql lacinia-schema :car_driver)
-          {:first-name "Lewis"})))
+  (testing "does nothing to data already in the right format"
+    (is (= {:first_name "Lewis"}
+           ((clj->gql lacinia-schema :car_driver)
+            {:first_name "Lewis"}))))
 
-  (is (= {:country_name "GB"
-          :winning_driver {:first_name "Lewis"
-                           :team_name "mercedes_gp"
-                           :champion true}
-          :competing_drivers [{:first_name "Lewis"
-                               :team_name "mercedes_gp"
-                               :champion true}
-                              {:first_name "Sebastian"
-                               :team_name "ferrari_scuderia"
-                               :champion true}
-                              {:first_name "Max"
-                               :team_name "red_bull"
-                               :champion false}]}
+  (testing "converts simple schemas"
+    (is (= {:first_name "Lewis"}
+           ((clj->gql lacinia-schema :car_driver)
+            {:first-name "Lewis"}))))
 
-         ((clj->gql lacinia-schema :car_race)
-          {:country-name "GB"
-           :winning-driver {:first-name "Lewis"
-                            :team-name :mercedes-gp
-                            :champion? true}
-           :competing-drivers [{:first-name "Lewis"
-                                :team-name :mercedes-gp
-                                :champion? true}
-                               {:first-name "Sebastian"
-                                :team-name :ferrari-scuderia
-                                :champion? true}
-                               {:first-name "Max"
-                                :team-name :red-bull
-                                :champion? false}]})))
+  (testing "converts complex schemas"
+    (is (= {:country_name "GB"
+            :winning_driver {:first_name "Lewis"
+                             :team_name "mercedes_gp"
+                             :champion true}
+            :competing_drivers [{:first_name "Lewis"
+                                 :team_name "mercedes_gp"
+                                 :champion true}
+                                {:first_name "Sebastian"
+                                 :team_name "ferrari_scuderia"
+                                 :champion true}
+                                {:first_name "Max"
+                                 :team_name "red_bull"
+                                 :champion false}]}
 
-  (is (= {:country_name "GB"
-          :top_driver {:first_name "Lewis"
-                       :team_name "mercedes_gp"}}
+           ((clj->gql lacinia-schema :car_race)
+            {:country-name "GB"
+             :winning-driver {:first-name "Lewis"
+                              :team-name :mercedes-gp
+                              :champion? true}
+             :competing-drivers [{:first-name "Lewis"
+                                  :team-name :mercedes-gp
+                                  :champion? true}
+                                 {:first-name "Sebastian"
+                                  :team-name :ferrari-scuderia
+                                  :champion? true}
+                                 {:first-name "Max"
+                                  :team-name :red-bull
+                                  :champion? false}]}))))
 
-         ((clj->gql lacinia-schema :car_race {:aliases {:top_driver :winning_driver}})
-          {:country-name "GB"
-           :top-driver {:first-name "Lewis"
-                        :team-name :mercedes-gp}}))))
+  (testing "supports aliases"
+    (is (= {:country_name "GB"
+            :top_driver {:first_name "Lewis"
+                         :team_name "mercedes_gp"}}
+
+           ((clj->gql lacinia-schema :car_race {:aliases {:top_driver :winning_driver}})
+            {:country-name "GB"
+             :top-driver {:first-name "Lewis"
+                          :team-name :mercedes-gp}}))))
+
+  (testing "supports top level queries"
+    (is (= [{:country_name "GB"
+             :winning_driver {:first_name "Lewis"
+                              :team_name "mercedes_gp"}}]
+
+           ((clj->gql lacinia-schema :car_races)
+            [{:country-name "GB"
+              :winning-driver {:first-name "Lewis"
+                               :team-name :mercedes-gp}}])))))
 
 (deftest gql->clj-test
 
-  (is (= {:first-name "Lewis"}
-         ((gql->clj lacinia-schema :car_driver)
-          {:first_name "Lewis"})))
+  (testing "does nothing to data already in the right format"
+    (is (= {:first-name "Lewis"}
+           ((gql->clj lacinia-schema :car_driver)
+            {:first-name "Lewis"}))))
 
-  (is (= {:country-name "GB"
-          :winning-driver {:first-name "Lewis"
-                           :team-name :mercedes-gp
-                           :champion? true}
-          :competing-drivers [{:first-name "Lewis"
-                               :team-name :mercedes-gp
-                               :champion? true}
-                              {:first-name "Sebastian"
-                               :team-name :ferrari-scuderia
-                               :champion? true}
-                              {:first-name "Max"
-                               :team-name :red-bull
-                               :champion? false}]}
+  (testing "supports simple schemas"
+    (is (= {:first-name "Lewis"}
+           ((gql->clj lacinia-schema :car_driver)
+            {:first_name "Lewis"}))))
 
-         ((gql->clj lacinia-schema :car_race)
-          {:country_name "GB"
-           :winning_driver {:first_name "Lewis"
-                            :team_name "mercedes_gp"
-                            :champion true}
-           :competing_drivers [{:first_name "Lewis"
-                                :team_name "mercedes_gp"
-                                :champion true}
-                               {:first_name "Sebastian"
-                                :team_name "ferrari_scuderia"
-                                :champion true}
-                               {:first_name "Max"
-                                :team_name "red_bull"
-                                :champion false}]})))
-
-  (is (= {:country-name "GB"
-          :top-driver {:first-name "Lewis"
-                       :team-name :mercedes-gp}}
-
-         ((gql->clj lacinia-schema :car_race {:aliases {:top_driver :winning_driver}})
-          {:country_name "GB"
-           :top_driver {:first_name "Lewis"
-                        :team_name "mercedes_gp"}})))
-
-  (is (= [{:country-name "GB"
+  (testing "supports complex schemas"
+    (is (= {:country-name "GB"
             :winning-driver {:first-name "Lewis"
-                             :team-name :mercedes-gp}}]
+                             :team-name :mercedes-gp
+                             :champion? true}
+            :competing-drivers [{:first-name "Lewis"
+                                 :team-name :mercedes-gp
+                                 :champion? true}
+                                {:first-name "Sebastian"
+                                 :team-name :ferrari-scuderia
+                                 :champion? true}
+                                {:first-name "Max"
+                                 :team-name :red-bull
+                                 :champion? false}]}
 
-         ((gql->clj lacinia-schema :car_races {})
-          [{:country_name "GB"
+           ((gql->clj lacinia-schema :car_race)
+            {:country_name "GB"
              :winning_driver {:first_name "Lewis"
-                              :team_name "mercedes_gp"}}]))))
+                              :team_name "mercedes_gp"
+                              :champion true}
+             :competing_drivers [{:first_name "Lewis"
+                                  :team_name "mercedes_gp"
+                                  :champion true}
+                                 {:first_name "Sebastian"
+                                  :team_name "ferrari_scuderia"
+                                  :champion true}
+                                 {:first_name "Max"
+                                  :team_name "red_bull"
+                                  :champion false}]}))))
+
+  (testing "supports aliases"
+    (is (= {:country-name "GB"
+            :top-driver {:first-name "Lewis"
+                         :team-name :mercedes-gp}}
+
+           ((gql->clj lacinia-schema :car_race {:aliases {:top_driver :winning_driver}})
+            {:country_name "GB"
+             :top_driver {:first_name "Lewis"
+                          :team_name "mercedes_gp"}}))))
+
+  (testing "supports top level queries"
+    (is (= [{:country-name "GB"
+             :winning-driver {:first-name "Lewis"
+                              :team-name :mercedes-gp}}]
+
+           ((gql->clj lacinia-schema :car_races)
+            [{:country_name "GB"
+              :winning_driver {:first_name "Lewis"
+                               :team_name "mercedes_gp"}}])))))
 
 ;; todo
 ;; 1. test that clj->gql and gql->clj are symmetric
-;; 2. Test that when data is already in the correct format it doesn't overwrite with nils
-;; 3. Check that nils don't appear for missing keys
-;; 4. Circular graphs? Avoid blowing up
+;; 2. Circular graphs? Avoid blowing up
