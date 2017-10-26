@@ -95,8 +95,11 @@
 (defn renamers
   ([schema type-key converter] (renamers schema type-key converter {}))
   ([schema type-key converter aliases]
-   (let [objects (-> (merge (:objects schema) (:queries schema))
+   (let [objects (-> (:objects schema)
                      (merge-aliases aliases))
+         type-key (if-let [query (get (:queries schema) type-key)]
+                    (:type query)
+                    type-key)
          enums (:enums schema)
          {:keys [from to]} converter]
 
@@ -141,11 +144,15 @@
                   (= 'list (first type)))
              (let [type (second type)
                    renamer (renamers schema type converter aliases)]
-               (recur (comp (fn [x]
-                              (if (not= ::not-found (get-in x path ::not-found))
-                                (update-in x path #(map renamer %))
-                                x))
-                            renames)
+               (recur (comp
+                       (if (empty? path)
+                         (fn [x]
+                           (map renamer x))
+                         (fn [x]
+                           (if (not= ::not-found (get-in x path ::not-found))
+                             (update-in x path #(map renamer %))
+                             x)))
+                       renames)
                       to-walk))
 
              :else (recur renames to-walk))))))))

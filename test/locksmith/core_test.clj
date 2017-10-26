@@ -101,11 +101,19 @@
          ((gql->clj lacinia-schema :car_race {:aliases {:top_driver :winning_driver}})
           {:country_name "GB"
            :top_driver {:first_name "Lewis"
-                        :team_name "mercedes_gp"}}))))
+                        :team_name "mercedes_gp"}})))
+
+  (is (= [{:country-name "GB"
+            :winning-driver {:first-name "Lewis"
+                             :team-name :mercedes-gp}}]
+
+         ((gql->clj lacinia-schema :car_races {})
+          [{:country_name "GB"
+             :winning_driver {:first_name "Lewis"
+                              :team_name "mercedes_gp"}}]))))
 
 ;; todo
 ;; 1. test that clj->gql and gql->clj are symmetric
 ;; 2. Test that when data is already in the correct format it doesn't overwrite with nils
 ;; 3. Check that nils don't appear for missing keys
-;; 4. Make it work for top level queries e.g. (clj->gql lacinia-schema :car_races)
-;; 5. Circular graphs? Avoid blowing up
+;; 4. Circular graphs? Avoid blowing up
