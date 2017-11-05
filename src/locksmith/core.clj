@@ -58,9 +58,16 @@
       (and (keyword? k)
            (re-find #"[_]" (name k)))))
 
+(defn- extract-type [t]
+  (if (and (list? t)
+           (= 'non-null (first t)))
+    (second t)
+    t))
+
 (defn rename-key [{:keys [from to]} path [k {:keys [type]}]]
   (when (gql? k type)
-    (let [from-name (from k type)
+    (let [type (extract-type type)
+          from-name (from k type)
           to-name (to k type)]
 
       (if (empty? path)
@@ -111,6 +118,7 @@
          renames
 
          (let [{:keys [type path] :as walking} (first to-walk)
+               type (extract-type type)
                to-walk (rest to-walk)]
 
            (cond

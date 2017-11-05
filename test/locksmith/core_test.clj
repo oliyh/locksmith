@@ -7,8 +7,8 @@
                         :values [:ferrari_scuderia :red_bull :mercedes_gp]}}
 
     :objects {:car_race {:fields {:winning_driver {:type :car_driver}
-                                  :competing_drivers {:type (list :car_driver)}
-                                  :country_name {:type String}}}
+                                  :competing_drivers {:type (list (non-null :car_driver))}
+                                  :country_name {:type (non-null String)}}}
               :car_driver {:fields {:first_name {:type String}
                                     :team_name {:type :team_name}
                                     :champion {:type Boolean}}}}
