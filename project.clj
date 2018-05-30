@@ -1,4 +1,4 @@
-(defproject locksmith "0.1.0"
+(defproject locksmith "0.1.1-SNAPSHOT"
   :description "Change all your keys between idiomatic clojure and GraphQL"
   :url "https://github.com/oliyh/locksmith"
   :license {:name "Eclipse Public License"
