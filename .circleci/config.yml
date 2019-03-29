@@ -1,0 +1,12 @@
+version: 2
+jobs:
+  build:
+    docker:
+      - image: clojure:lein-2.8.1
+    steps:
+      - run: which java
+      - run: lein --version
+
+      - checkout
+
+      - run: lein test
