@@ -1,5 +1,6 @@
 (ns locksmith.core
-  (:require [clojure.string :as string]))
+  (:require [clojure.string :as string]
+            [camel-snake-kebab.core :refer [->kebab-case ->kebab-case-keyword]]))
 
 ;; taken from plumbing.core
 
@@ -32,18 +33,14 @@
    (for-map [[k v] m] k (f v))))
 
 (defn ->gql [k type]
-  (-> k
-      name
-      (string/replace "-" "_")
-      (string/replace "?" "")
-      (#(if (= :enum type)
-          %
-          (keyword %)))))
+  (if (= :enum type)
+    (name k)
+    (keyword k)))
 
 (defn ->clj [k type]
   (-> k
       name
-      (string/replace "_" "-")
+      ->kebab-case
       (#(if (= 'Boolean type)
           (str % "?")
           %))
@@ -51,12 +48,12 @@
 
 (defn clj? [k _]
   (and (keyword? k)
-       (re-find #"[-\?]" (name k))))
+       (= k (->kebab-case-keyword k))))
 
 (defn gql? [k type]
   (or (= 'Boolean type)
       (and (keyword? k)
-           (re-find #"[_]" (name k)))))
+           (not= k (->kebab-case-keyword k)))))
 
 (defn- extract-type [t]
   (if (and (list? t)

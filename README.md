@@ -1,11 +1,12 @@
 # locksmith
 
-Want to use GraphQL with Clojure/script but don't want snake_keys everywhere? Use locksmith to change all the keys!
+Want to use GraphQL with Clojure/script but don't want snake_keys or camelKeys everywhere? Use locksmith to change all the keys!
 
-locksmith creates efficient functions to transform GraphQL keys (e.g. `snake_key`, `boolean_key`) into Clojure keys (`snake-key`, `boolean-key?`) and vice versa.
+locksmith creates efficient functions to transform GraphQL keys (e.g. `snake_key`, `camelKey`, `boolean_key`) into Clojure keys (`snake-key`, `camel-key`, `boolean-key?`) and vice versa.
 It does this by inspecting your [lacinia](https://github.com/walmartlabs/lacinia) GraphQL schema, deciding which keys need renaming and composing functions to do the renames as fast as possible.
 
 This helps you satisfy GraphQL queries on your server and work with idiomatic Clojure data on your client.
+It uses [camel-snake-kebab](https://github.com/clj-commons/camel-snake-kebab) under the hood, with the addition of adding `?` as a suffix for boolean types.
 
 [![Clojars Project](https://img.shields.io/clojars/v/locksmith.svg)](https://clojars.org/locksmith)
 
@@ -26,7 +27,7 @@ Imagine you have a schema for a car race, as follows:
                                     :champion {:type Boolean}}}}})
 ```
 
-On your server you have lots of lovely Clojure data, but you have to put loads of underscores in it to satisfy any GraphQL queries that come in.
+On your server you have lots of lovely Clojure data, but you have to put loads of underscores or camels in it to satisfy any GraphQL queries that come in.
 locksmith's `clj->gql` does this for you!
 
 ```clj
@@ -56,7 +57,7 @@ locksmith's `clj->gql` does this for you!
 ;;  {:champion true, :team_name "mercedes_gp", :first_name "Lewis"}}
 ```
 
-On your client you crave Clojure data, but the GraphQL server is trying to force feed you underscores.
+On your client you crave Clojure data, but the GraphQL server is trying to force feed you underscores or camels.
 locksmith's `gql->clj` sorts it out!
 
 ```clj

@@ -11,7 +11,7 @@
                   ["change" "version" "leiningen.release/bump-version"]
                   ["vcs" "commit"]
                   ["vcs" "push"]]
-  :dependencies []
+  :dependencies [[camel-snake-kebab "0.4.0"]]
   :plugins [[lein-doo "0.1.8"]]
   :profiles {:provided {:dependencies [[org.clojure/clojure "1.9.0-beta2"]
                                        [org.clojure/clojurescript "1.9.946"]]}
