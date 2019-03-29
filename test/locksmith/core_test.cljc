@@ -4,7 +4,7 @@
 
 (def snake-schema
   '{:enums {:team_name {:description "Some enumerated teams"
-                        :values [:ferrari_scuderia :red_bull :mercedes_gp]}}
+                        :values [:ferrari_scuderia :red_bull :mercedes_gp :HAAS]}}
 
     :objects {:car_race {:fields {:winning_driver {:type :car_driver}
                                   :competing_drivers {:type (list (non-null :car_driver))}
@@ -17,7 +17,7 @@
 
 (def camel-schema
   '{:enums {:teamName {:description "Some enumerated teams"
-                        :values [:ferrariScuderia :redBull :mercedesGP]}}
+                        :values [:ferrariScuderia :redBull :mercedesGP :HAAS]}}
 
     :objects {:carRace {:fields {:winningDriver {:type :carDriver}
                                   :competingDrivers {:type (list (non-null :carDriver))}
@@ -27,6 +27,24 @@
                                     :champion {:type Boolean}}}}
 
     :queries {:carRaces {:type (list :carRace)}}})
+
+(deftest uppercase-enums-test
+  (testing "clj->gql"
+    (are [schema root expected] (= expected
+                                   ((clj->gql schema root)
+                                    {:team-name :haas}))
+
+
+      snake-schema :car_driver {:team_name "HAAS"}
+      camel-schema :carDriver {:teamName "HAAS"}))
+
+  (testing "gql->clj"
+    (are [schema root to-convert] (= {:team-name :haas}
+                                     ((gql->clj schema root)
+                                      to-convert))
+
+      snake-schema :car_driver {:team_name "HAAS"}
+      camel-schema :carDriver {:teamName "HAAS"})))
 
 (deftest clj->gql-test
 
